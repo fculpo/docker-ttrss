@@ -2,6 +2,7 @@ FROM ubuntu:18.10
 MAINTAINER Fabien Culpo <fabien.culpo@gmail.com>
 
 RUN ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime
+RUN mkdir /run/php
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y \
   git nginx supervisor php7.2-fpm php7.2-cli php7.2-curl php7.2-gd php7.2-json \
