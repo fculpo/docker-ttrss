@@ -1,11 +1,11 @@
-FROM ubuntu:18.04
+FROM ubuntu:18.10
 MAINTAINER Fabien Culpo <fabien.culpo@gmail.com>
 
 RUN ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y \
   git nginx supervisor php7.2-fpm php7.2-cli php7.2-curl php7.2-gd php7.2-json \
-  php7.2-pgsql php7.2-ldap php7.2-mysql php7.2-opcache php7.2-xml php7.2-mbstring curl --no-install-recommends \
+  php7.2-pgsql php7.2-ldap php7.2-mysql php7.2-opcache php7.2-xml php7.2-mbstring curl ca-certificates --no-install-recommends \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
