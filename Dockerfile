@@ -2,7 +2,7 @@ FROM ubuntu:18.10
 MAINTAINER Fabien Culpo <fabien.culpo@gmail.com>
 
 RUN ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime
-RUN mkdir /run/php
+RUN mkdir -p /run/php
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y \
   git nginx supervisor php7.2-fpm php7.2-cli php7.2-curl php7.2-gd php7.2-json \
@@ -23,6 +23,7 @@ RUN curl -SL https://git.tt-rss.org/git/tt-rss/archive/master.tar.gz | tar xzC /
 RUN git clone https://github.com/hydrian/TTRSS-Auth-LDAP.git /TTRSS-Auth-LDAP && \
     cp -r /TTRSS-Auth-LDAP/plugins/auth_ldap plugins/ && \
     ls -la /var/www/plugins
+
 RUN cp config.php-dist config.php
 
 # expose only nginx HTTP port
