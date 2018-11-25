@@ -17,14 +17,15 @@ RUN rm /etc/nginx/sites-enabled/default
 
 # install ttrss and patch configuration
 WORKDIR /var/www
-RUN curl -SL https://git.tt-rss.org/git/tt-rss/archive/master.tar.gz | tar xzC /var/www --strip-components 1 \
-    && chown www-data:www-data -R /var/www
+RUN curl -SL https://git.tt-rss.org/git/tt-rss/archive/master.tar.gz | tar xzC /var/www --strip-components 1
 
 RUN git clone https://github.com/hydrian/TTRSS-Auth-LDAP.git /TTRSS-Auth-LDAP && \
     cp -r /TTRSS-Auth-LDAP/plugins/auth_ldap plugins/ && \
     ls -la /var/www/plugins
 
 RUN cp config.php-dist config.php
+
+RUN chown www-data:www-data -R /var/www
 
 # expose only nginx HTTP port
 EXPOSE 80
