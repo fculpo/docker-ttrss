@@ -1,12 +1,13 @@
-FROM ubuntu:14.04
-MAINTAINER Christian Lück <christian@lueck.tv>
+FROM ubuntu:18.04
+MAINTAINER Fabien Culpo <fabien.culpo@gmail.com>
+
+RUN ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y \
-  git nginx supervisor php5-fpm php5-cli php5-curl php5-gd php5-json \
-  php5-pgsql php5-ldap php5-mysql php5-mcrypt && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# enable the mcrypt module
-RUN php5enmod mcrypt
+  git nginx supervisor php7.2-fpm php7.2-cli php7.2-curl php7.2-gd php7.2-json \
+  php7.2-pgsql php7.2-ldap php7.2-mysql php7.2-opcache php7.2-xml php7.2-mbstring curl --no-install-recommends \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 # add ttrss as the only nginx site
 ADD ttrss.nginx.conf /etc/nginx/sites-available/ttrss
@@ -15,9 +16,7 @@ RUN rm /etc/nginx/sites-enabled/default
 
 # install ttrss and patch configuration
 WORKDIR /var/www
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y curl --no-install-recommends && rm -rf /var/lib/apt/lists/* \
-    && curl -SL https://git.tt-rss.org/git/tt-rss/archive/master.tar.gz | tar xzC /var/www --strip-components 1 \
-    && apt-get purge -y --auto-remove curl \
+RUN curl -SL https://git.tt-rss.org/git/tt-rss/archive/master.tar.gz | tar xzC /var/www --strip-components 1 \
     && chown www-data:www-data -R /var/www
 
 RUN git clone https://github.com/hydrian/TTRSS-Auth-LDAP.git /TTRSS-Auth-LDAP && \
