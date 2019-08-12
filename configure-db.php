@@ -1,12 +1,13 @@
 #!/usr/bin/env php
 <?php
 
-$confpath = '/var/www/config.php';
+$confdist = '/var/www/html/config.php-dist';
 
 $config = array();
 
 // path to ttrss
 $config['SELF_URL_PATH'] = env('SELF_URL_PATH', 'http://localhost');
+$config['LOG_DESTINATION'] = env('LOG_DESTINATION', '');
 
 if (getenv('DB_TYPE') !== false) {
     $config['DB_TYPE'] = getenv('DB_TYPE');
@@ -45,9 +46,9 @@ if (!empty($eport)) {
 }
 
 // database credentials for this instance
-//   database name (DB_NAME) can be supplied or detaults to "ttrss"
-//   database user (DB_USER) can be supplied or defaults to database name
-//   database pass (DB_PASS) can be supplied or defaults to database user
+// database name (DB_NAME) can be supplied or detaults to "ttrss"
+// database user (DB_USER) can be supplied or defaults to database name
+// database pass (DB_PASS) can be supplied or defaults to database user
 $config['DB_NAME'] = env('DB_NAME', 'ttrss');
 $config['DB_USER'] = env('DB_USER', $config['DB_NAME']);
 $config['DB_PASS'] = env('DB_PASS', $config['DB_USER']);
@@ -55,8 +56,8 @@ $config['DB_PASS'] = env('DB_PASS', $config['DB_USER']);
 if (!dbcheck($config)) {
     echo 'Database login failed, trying to create...' . PHP_EOL;
     // superuser account to create new database and corresponding user account
-    //   username (SU_USER) can be supplied or defaults to "docker"
-    //   password (SU_PASS) can be supplied or defaults to username
+    // username (SU_USER) can be supplied or defaults to "docker"
+    // password (SU_PASS) can be supplied or defaults to username
 
     $super = $config;
 
@@ -90,7 +91,7 @@ try {
 }
 catch (PDOException $e) {
     echo 'Database table not found, applying schema... ' . PHP_EOL;
-    $schema = file_get_contents('schema/ttrss_schema_' . $config['DB_TYPE'] . '.sql');
+    $schema = file_get_contents('/var/www/html/schema/ttrss_schema_' . $config['DB_TYPE'] . '.sql');
     $schema = preg_replace('/--(.*?);/', '', $schema);
     $schema = preg_replace('/[\r\n]/', ' ', $schema);
     $schema = trim($schema, ' ;');
@@ -100,7 +101,9 @@ catch (PDOException $e) {
     unset($pdo);
 }
 
-$contents = file_get_contents($confpath);
+$contents = file_get_contents($confdist);
+
+# LDAP config
 if(getenv('AUTH_METHOD') == "ldap") {
     $config['PLUGINS'] = 'auth_ldap, note';
     if(getenv('PLUGINS')!=""){
@@ -119,11 +122,12 @@ if(getenv('AUTH_METHOD') == "ldap") {
     $contents .= "define('LDAP_AUTH_LOG_ATTEMPTS', " . env("LDAP_AUTH_LOG_ATTEMPTS", "FALSE") . ");\n";
     $contents .= "define('LDAP_AUTH_DEBUG', " . env("LDAP_AUTH_DEBUG", "FALSE") . ");\n";
 }
+
 foreach ($config as $name => $value) {
     $contents = preg_replace('/(define\s*\(\'' . $name . '\',\s*)(.*)(\);)/', '$1"' . $value . '"$3', $contents);
 }
 
-file_put_contents($confpath, $contents);
+file_put_contents('/var/www/html/config.php', $contents);
 
 function env($name, $default = null)
 {
@@ -166,4 +170,3 @@ function dbcheck($config)
         return false;
     }
 }
-
