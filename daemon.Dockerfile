@@ -1,4 +1,4 @@
-FROM php:alpine
+FROM php:7.4-fpm-alpine3.11
 LABEL maintainer="Fabien Culpo <fabien.culpo@gmail.com> (@fculpo)"
 
 RUN set -ex \
