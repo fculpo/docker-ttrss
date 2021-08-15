@@ -1,4 +1,4 @@
-FROM php:7.4-fpm-alpine3.11
+FROM php:fpm-alpine3.14
 LABEL maintainer="Fabien Culpo <fabien.culpo@gmail.com> (@fculpo)"
 
 RUN set -ex \
@@ -7,14 +7,9 @@ RUN set -ex \
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-COPY configure-db.php /configure-db.php
-COPY entrypoint.sh /entrypoint.sh
-RUN chown www-data:www-data /configure-db.php /entrypoint.sh
-
 WORKDIR /var/www/html
 USER www-data
 
 RUN curl -SL https://git.tt-rss.org/git/tt-rss/archive/master.tar.gz | tar xzC ./ --strip-components 1
 
-ENTRYPOINT ["/entrypoint.sh"]
 CMD ["php", "./update_daemon2.php"]
