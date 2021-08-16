@@ -6,6 +6,7 @@ RUN set -ex \
     && docker-php-ext-install -j$(nproc) intl pdo_pgsql pgsql pcntl
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+RUN ln -s /usr/local/bin/php /usr/bin/php
 
 WORKDIR /var/www/html
 USER www-data
